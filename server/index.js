@@ -14,14 +14,20 @@ import postRoutes from "./routes/posts.js";
 import { register } from "./controllers/auth.js";
 import { createPost } from "./controllers/posts.js";
 import { verifyToken } from "./middleware/auth.js";
-import User from "./models/User.js";
-import Post from "./models/Post.js";
-import { users, posts } from "./data/index.js";
+
+
+dotenv.config();
+import './passport.js';
+import passport from "passport";
+import cookieSession from "cookie-session";
+
+
+
 
 /* CONFIGURATIONS */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-dotenv.config();
+
 const app = express();
 app.use(express.json());
 app.use(helmet());
@@ -29,8 +35,29 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("common"));
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
-app.use(cors());
+
+app.use(
+	cors({
+		origin: "http://localhost:3000",
+		methods: "GET,POST,PUT,DELETE",
+		credentials: true,
+	})
+);
+
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
+
+// Google oauth
+app.use(
+	cookieSession({
+		name: "session",
+		keys: ["randomkey"],
+		maxAge: 24 * 60 * 60 * 100,
+	})
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 /* FILE STORAGE */
 const storage = multer.diskStorage({

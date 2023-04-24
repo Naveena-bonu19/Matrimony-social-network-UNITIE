@@ -55,6 +55,13 @@ const Form = () => {
   const isLogin = pageType === "login";
   const isRegister = pageType === "register";
 
+  const googleAuth = () => {
+    window.open(
+			`${process.env.REACT_APP_API_URL}/auth/google/callback`,
+			"_self"
+		);
+  }
+
   const register = async (values, onSubmitProps) => {
     // this allows us to send form info with image
     const formData = new FormData();
@@ -265,6 +272,9 @@ const Form = () => {
                 ? "Don't have an account? Sign Up here."
                 : "Already have an account? Login here."}
             </Typography>
+            <button  onClick={googleAuth}>
+						<span>Sing up with Google</span>
+					</button>
           </Box>
         </form>
       )}

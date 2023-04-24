@@ -1,17 +1,37 @@
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
-import HomePage from "scenes/homePage";
-import LoginPage from "scenes/loginPage";
-import ProfilePage from "scenes/profilePage";
+import HomePage from "pages/homePage";
+import LoginPage from "pages/loginPage";
+import ProfilePage from "pages/profilePage";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import { themeSettings } from "./theme";
+import axios from 'axios';
+import { useEffect} from "react";
+
+
 
 function App() {
   const mode = useSelector((state) => state.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
   const isAuth = Boolean(useSelector((state) => state.token));
+   
+	const getUser = async () => {
+		try {
+			const url = `${process.env.REACT_APP_API_URL}/auth/login/success`;
+			const { data } = await axios.get(url, { withCredentials: true });
+      console.log(data.user);
+     
+		} catch (err) {
+			console.log(err);
+		}
+	};
+
+	useEffect(() => {
+		getUser();
+	}, []);
+
 
   return (
     <div className="app">
@@ -22,11 +42,11 @@ function App() {
             <Route path="/" element={<LoginPage />} />
             <Route
               path="/home"
-              element={isAuth ? <HomePage /> : <Navigate to="/" />}
+              element={ (isAuth) ? <HomePage /> : <Navigate to="/" />}
             />
             <Route
               path="/profile/:userId"
-              element={isAuth ? <ProfilePage /> : <Navigate to="/" />}
+              element={(isAuth) ? <ProfilePage /> : <Navigate to="/" />}
             />
           </Routes>
         </ThemeProvider>
